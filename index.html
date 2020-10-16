@@ -91,7 +91,7 @@
       let init = async function() {
         await new Promise(r => setTimeout(r, 1000));
 
-        let client = new Paho.MQTT.Client('broker.hivemq.com', 8000, Math.random().toString(36).substring(7));
+        let client = new Paho.MQTT.Client('broker.emqx.io', 8084, Math.random().toString(36).substring(7));
 
         client.connect({
           useSSL: window.location.protocol == 'https:',
