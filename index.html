@@ -88,76 +88,82 @@
     <div id='meet'></div>
 
     <script>
-      let client = new Paho.MQTT.Client('broker.hivemq.com', 8000, Math.random().toString(36).substring(7));
+      let init = async function() {
+        await new Promise(r => setTimeout(r, 1000));
 
-      client.connect({
-        useSSL: true,
-        onSuccess: function() {
-          client.subscribe('ckt01', {});
-          document.getElementsByTagName('h1')[0].style.display = 'none';
-          document.getElementById('login').style.display = 'block';
-        }
-      });
+        let client = new Paho.MQTT.Client('broker.hivemq.com', 8000, Math.random().toString(36).substring(7));
 
-      client.onConnectionLost = function(responseObject) {
-        console.log(`onConnectionLost: ${responseObject.errorMessage}`);
+        client.connect({
+          useSSL: window.location.protocol == 'https:',
+          onSuccess: function() {
+            client.subscribe('ckt01', {});
+            document.getElementsByTagName('h1')[0].style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+          }
+        });
+
+        client.onConnectionLost = function(responseObject) {
+          console.log(`onConnectionLost: ${responseObject.errorMessage}`);
+        };
+
+        client.onMessageArrived = function(message) {
+          let payload = JSON.parse(message.payloadString);
+
+          if (payload.action == 'reset') {
+            document.getElementById('buzzed').innerHTML = '';
+            document.getElementById('buzz').style.display = 'block';
+
+          } else if (payload.action == 'buzz') {
+            let node = document.createElement('li');
+            let textnode = document.createTextNode(payload.name);
+
+            node.appendChild(textnode);
+            document.getElementById('buzzed').appendChild(node);
+          }
+        };
+
+        document.getElementById('form').addEventListener('submit', function(event) {
+          event.preventDefault();
+
+          let name = document.getElementById('name').value;
+
+          if (name && name.length) {
+            window.userName = name;
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('controls').style.display = 'block';
+
+            window.jitsiClient = new JitsiMeetExternalAPI('meet.jit.si', {
+              roomName: 'ckt01',
+              width: '100%',
+              userInfo: { displayName: name },
+              parentNode: document.querySelector('#meet')
+            });
+          }
+        });
+
+        document.getElementById('reset').addEventListener('click', function(event) {
+          event.preventDefault();
+
+          let message = new Paho.MQTT.Message(JSON.stringify({ action: 'reset' }));
+
+          message.destinationName = 'ckt01';
+
+          client.send(message);
+        });
+
+        document.getElementById('buzz').addEventListener('click', function(event) {
+          event.preventDefault();
+
+          let message = new Paho.MQTT.Message(JSON.stringify({ action: 'buzz', name: window.userName }));
+
+          message.destinationName = 'ckt01';
+
+          client.send(message);
+          this.style.display = 'none';
+        });
       };
 
-      client.onMessageArrived = function(message) {
-        let payload = JSON.parse(message.payloadString);
-
-        if (payload.action == 'reset') {
-          document.getElementById('buzzed').innerHTML = '';
-          document.getElementById('buzz').style.display = 'block';
-
-        } else if (payload.action == 'buzz') {
-          let node = document.createElement('li');
-          let textnode = document.createTextNode(payload.name);
-
-          node.appendChild(textnode);
-          document.getElementById('buzzed').appendChild(node);
-        }
-      };
-
-      document.getElementById('form').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        let name = document.getElementById('name').value;
-
-        if (name && name.length) {
-          window.userName = name;
-          document.getElementById('login').style.display = 'none';
-          document.getElementById('controls').style.display = 'block';
-
-          window.jitsiClient = new JitsiMeetExternalAPI('meet.jit.si', {
-            roomName: 'ckt01',
-            width: '100%',
-            userInfo: { displayName: name },
-            parentNode: document.querySelector('#meet')
-          });
-        }
-      });
-
-      document.getElementById('reset').addEventListener('click', function(event) {
-        event.preventDefault();
-
-        let message = new Paho.MQTT.Message(JSON.stringify({ action: 'reset' }));
-
-        message.destinationName = 'ckt01';
-
-        client.send(message);
-      });
-
-      document.getElementById('buzz').addEventListener('click', function(event) {
-        event.preventDefault();
-
-        let message = new Paho.MQTT.Message(JSON.stringify({ action: 'buzz', name: window.userName }));
-
-        message.destinationName = 'ckt01';
-
-        client.send(message);
-        this.style.display = 'none';
-      });
+      init();
     </script>
   </body>
 </html>
