@@ -3,36 +3,95 @@
   <head>
     <title>Ckt01</title>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js' type='text/javascript'></script>
+    <script src='https://meet.jit.si/external_api.js'></script>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #meet iframe {
+        height: 100%;
+        position: fixed;
+      }
+
+      #controls {
+        display: none;
+        position: absolute;
+        top: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        z-index: 1;
+        padding: 5px 10px;
+      }
+
+      #controls ol {
+        margin: 0;
+        clear: both;
+        padding-left: 20px;
+      }
+
+      #controls ol li:first-child {
+        padding-top: 20px;
+      }
+
+      #controls a {
+        color: black;
+        text-decoration: none;
+        background: white;
+        padding: 5px 10px;
+        margin-right: 10px;
+        float: left;
+      }
+
+      #login {
+        display: none;
+        position: absolute;
+        top: 50%;
+        text-align: center;
+        width: 100%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+      }
+
+      #login input {
+        font-size: 2em;
+        padding: 5px 10px;
+        text-align: center;
+      }
+
+      #login button {
+        margin-top: 20px;
+        padding: 5px 10px;
+      }
+    </style>
   </head>
 
-  <body style='margin:0; padding:0; overflow:hidden;'>
+  <body>
     <h1>Initializing...</h1>
-    <iframe src='https://meet.jit.si/ckt01' frameborder='0' width='100%' style='position:fixed; height:calc(100% - 50px)'></iframe>
 
-    <div id='login' style='display:none; position:fixed; bottom:0; left:0;'>
+    <div id='login'>
       <form action='/' id='form'>
-        <label>
-          Name
-          <br>
-          <input type='text' name='name' id='name'>
-        </label>
-
+        <input type='text' name='name' id='name' placeholder='Name'>
         <div><button type='submit'>Play</button></div>
       </form>
     </div>
 
-    <div id='controls' style='display:none; position:fixed; bottom:0; left:0;'>
-      <div><a href='' id='reset'>Reset</a></div>
-      <div><a href='' id='buzz'>Buzz</a></div>
+    <div id='controls'>
+      <a href='' id='reset'>Reset</a>
+      <a href='' id='buzz'>Buzz</a>
 
-      <ul id='buzzed'></ul>
+      <ol id='buzzed'></ol>
     </div>
+
+    <div id='meet'></div>
 
     <script>
       let client = new Paho.MQTT.Client('broker.hivemq.com', 8000, Math.random().toString(36).substring(7));
 
       client.connect({
-        useSSL: true,
+        useSSL: window.location.protocol == 'https:',
         onSuccess: function() {
           client.subscribe('ckt01', {});
           document.getElementsByTagName('h1')[0].style.display = 'none';
@@ -69,6 +128,13 @@
           window.userName = name;
           document.getElementById('login').style.display = 'none';
           document.getElementById('controls').style.display = 'block';
+
+          window.jitsiClient = new JitsiMeetExternalAPI('meet.jit.si', {
+            roomName: 'ckt01',
+            width: '100%',
+            userInfo: { displayName: name },
+            parentNode: document.querySelector('#meet')
+          });
         }
       });
 
