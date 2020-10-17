@@ -136,7 +136,10 @@
               roomName: 'ckt01',
               width: '100%',
               userInfo: { displayName: name },
-              parentNode: document.querySelector('#meet')
+              parentNode: document.querySelector('#meet'),
+              configOverwrite: {
+                disableDeepLinking: true
+              }
             });
           }
         });
