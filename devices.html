@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ckt01</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js' type='text/javascript'></script>
+    <script src='https://meet.jit.si/external_api.js'></script>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #meet iframe {
+        height: 100%;
+        position: fixed;
+      }
+
+      #controls {
+        display: none;
+        position: absolute;
+        top: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        z-index: 1;
+        padding: 5px 10px;
+      }
+
+      #controls ol {
+        margin: 0;
+        clear: both;
+        padding-left: 20px;
+      }
+
+      #controls ol li:first-child {
+        padding-top: 20px;
+      }
+
+      #controls a {
+        color: black;
+        text-decoration: none;
+        background: white;
+        padding: 5px 10px;
+        margin-right: 10px;
+        float: left;
+      }
+
+      #login {
+        display: none;
+        position: absolute;
+        top: 50%;
+        text-align: center;
+        width: 100%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+      }
+
+      #login input {
+        font-size: 2em;
+        padding: 5px 10px;
+        text-align: center;
+      }
+
+      #login button {
+        margin-top: 20px;
+        padding: 5px 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <a href='#' onclick='getDevices()'>Get Devices</a>
+    <table>
+      <thead>
+        <th>Device ID</th>
+        <th>Kind</th>
+        <th>Label</th>
+        <th>Group ID</th>
+      </thead>
+      <tbody id='table-body'>
+      </tbody>
+    </table>
+
+    <script>
+      function getDevices() {
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+          let body = document.getElementById('table-body');
+
+          devices.forEach(device => {
+            let tr = document.createElement('tr');
+            ['deviceId', 'kind', 'label', 'groupId'].forEach(key => {
+              let cell = document.createElement('td');
+              cell.innerText = device[key];
+              tr.append(cell)
+            });
+            body.append(tr);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
