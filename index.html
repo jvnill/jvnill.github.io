@@ -69,7 +69,9 @@
   </head>
 
   <body>
-    <h1>Initializing...</h1>
+    <a href='' onclick="navigator.mediaDevices.enumerateDevices().then(function(list) { alert(JSON.stringify(list)); })">Get Devices</a>
+
+    <!--h1>Initializing...</h1>
 
     <div id='login'>
       <form action='/' id='form'>
@@ -87,7 +89,7 @@
 
     <div id='meet'></div>
 
-    <script>
+    <!--script>
       let init = async function() {
         await new Promise(r => setTimeout(r, 1000));
 
@@ -167,6 +169,6 @@
       };
 
       init();
-    </script>
+    </script-->
   </body>
 </html>
