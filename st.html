@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stock</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #login {
+        position: absolute;
+        top: 50%;
+        text-align: center;
+        width: 100%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+      }
+
+      #login input {
+        font-size: 2em;
+        padding: 5px 10px;
+        text-align: center;
+      }
+
+      #login button {
+        margin-top: 20px;
+        padding: 5px 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id='login'>
+      <form action='https://www.alphavantage.co/query' id='form' target='_blank'>
+        <input type='hidden' name='function' value='TIME_SERIES_DAILY'>
+        <input type='hidden' name='outputsize' value='full'>
+        <input type='hidden' name='datatype' value='csv'>
+        <div>
+          <input type='text' name='apikey' placeholder='API Key'>
+        </div>
+
+        <div>
+          <input type='text' name='symbol' placeholder='TSLA'>
+        </div>
+
+        <div><button type='submit'>Download</button></div>
+      </form>
+    </div>
+  </body>
+</html>
